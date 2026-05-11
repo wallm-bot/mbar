@@ -1,0 +1,6 @@
+[env]
+# We still keep this just in case, though the rustflags are the primary fix
+CXXQT_SKIP_LINKER_CHECK = "1"
+
+[target.'cfg(all())']
+rustflags = ["-C", "link-arg=-fuse-ld=bfd"]

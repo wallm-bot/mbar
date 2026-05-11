@@ -1,0 +1,29 @@
+[package]
+name = "mbar"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+cxx = "1.0"
+cxx-qt = "0.8.1"
+cxx-qt-lib = { version = "0.8.1", features = ["qt_gui", "qt_qml"] }
+chrono = "0.4"
+sysinfo = "0.33"
+nvml-wrapper = "0.10"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+mimalloc = "0.1"
+ureq = { version = "2.12", features = ["json"] }
+oauth2 = { version = "5.0", default-features = false, features = ["ureq"] }
+home = "0.5"
+urlencoding = "2.1"
+tiny_http = "0.12"
+
+[build-dependencies]
+cxx-qt-build = { version = "0.8.1", features = ["link_qt_object_files"] }
+
+[profile.release]
+opt-level = "s"     # Optimize for size
+lto = true          # Enable Link Time Optimization
+codegen-units = 1   # Reduce parallel code generation for better optimization
+panic = "abort"     # Reduce binary size by removing panic unwinding info
