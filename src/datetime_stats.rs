@@ -93,6 +93,12 @@ mod tests {
     }
 
     #[test]
+    fn test_time_string_length() {
+        let info = get_datetime_info(Local::now());
+        assert_eq!(info.time.len(), 8);
+    }
+
+    #[test]
     fn test_timezone_conversion() {
         // This is a bit tricky with Local::now() because it depends on the system environment.
         // However, we can test the internal logic if we were to use a more generic DateTime.
