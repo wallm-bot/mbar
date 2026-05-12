@@ -34,7 +34,8 @@ pub struct DateTimeInfo {
     pub timezone: String,
 }
 
-pub fn get_datetime_info(now: chrono::DateTime<chrono::Local>) -> DateTimeInfo {
+pub fn get_datetime_info<T: chrono::TimeZone>(now: chrono::DateTime<T>) -> DateTimeInfo 
+where T::Offset: std::fmt::Display {
     let current_time = now.format("%H:%M:%S").to_string();
     let current_day = now.format("%A").to_string();
     let current_date = now.format("%b %d").to_string();
@@ -74,12 +75,12 @@ impl qobject::DateTimeBackend {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::{TimeZone, Utc, FixedOffset};
+    use chrono::{TimeZone};
 
     #[test]
     fn test_get_datetime_info_format() {
         // Use a fixed time to ensure predictable results
-        let offset = FixedOffset::east_opt(8 * 3600).unwrap(); // UTC+8
+        let offset = chrono::FixedOffset::east_opt(8 * 3600).unwrap(); // UTC+8
         let dt = offset.with_ymd_and_hms(2026, 5, 12, 12, 0, 0).unwrap();
         
         let info = get_datetime_info(dt);
@@ -92,7 +93,7 @@ mod tests {
 
     #[test]
     fn test_timezone_negative_offset() {
-        let offset = FixedOffset::west_opt(5 * 3600).unwrap(); // UTC-5
+        let offset = chrono::FixedOffset::west_opt(5 * 3600).unwrap(); // UTC-5
         let dt = offset.with_ymd_and_hms(2026, 5, 12, 12, 0, 0).unwrap();
         
         let info = get_datetime_info(dt);
