@@ -34,7 +34,8 @@ pub struct DateTimeInfo {
     pub timezone: String,
 }
 
-pub fn get_datetime_info(now: chrono::DateTime<chrono::Local>) -> DateTimeInfo {
+pub fn get_datetime_info<T: chrono::TimeZone>(now: chrono::DateTime<T>) -> DateTimeInfo 
+where T::Offset: std::fmt::Display {
     let current_time = now.format("%H:%M:%S").to_string();
     let current_day = now.format("%A").to_string();
     let current_date = now.format("%b %d").to_string();
