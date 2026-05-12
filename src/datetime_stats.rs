@@ -74,37 +74,35 @@ impl qobject::DateTimeBackend {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::Local;
+    use chrono::{TimeZone, Utc, FixedOffset};
 
     #[test]
     fn test_get_datetime_info_format() {
-        // Create a fixed time: 2026-05-11 21:00:00
-        // Since get_datetime_info takes chrono::Local, we should try to mock or at least test the formatting.
-        // We can use FixedOffset to simulate different zones if we want deeper tests, 
-        // but for now let's verify the format logic with the current Local.
+        // Use a fixed time to ensure predictable results
+        let offset = FixedOffset::east_opt(8 * 3600).unwrap(); // UTC+8
+        let dt = offset.with_ymd_and_hms(2026, 5, 12, 12, 0, 0).unwrap();
         
-        let now = Local::now();
-        let info = get_datetime_info(now);
+        let info = get_datetime_info(dt);
         
-        assert!(info.time.contains(':'));
-        assert!(!info.day.is_empty());
-        assert!(!info.date.is_empty());
-        assert!(info.timezone.starts_with("UTC"));
+        assert_eq!(info.time, "12:00:00");
+        assert_eq!(info.day, "Tuesday");
+        assert_eq!(info.date, "May 12");
+        assert_eq!(info.timezone, "UTC+8");
+    }
+
+    #[test]
+    fn test_timezone_negative_offset() {
+        let offset = FixedOffset::west_opt(5 * 3600).unwrap(); // UTC-5
+        let dt = offset.with_ymd_and_hms(2026, 5, 12, 12, 0, 0).unwrap();
+        
+        let info = get_datetime_info(dt);
+        assert_eq!(info.timezone, "UTC-5");
     }
 
     #[test]
     fn test_time_string_length() {
-        let info = get_datetime_info(Local::now());
+        let now = chrono::Local::now();
+        let info = get_datetime_info(now);
         assert_eq!(info.time.len(), 8);
-    }
-
-    #[test]
-    fn test_timezone_conversion() {
-        // This is a bit tricky with Local::now() because it depends on the system environment.
-        // However, we can test the internal logic if we were to use a more generic DateTime.
-        // For now, let's just ensure it doesn't crash and returns a sane value.
-        let info = get_datetime_info(Local::now());
-        println!("Timezone string: {}", info.timezone);
-        assert!(info.timezone.len() >= 3);
     }
 }
