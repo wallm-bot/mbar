@@ -123,3 +123,20 @@ impl qobject::SystemStatsBackend {
         self.as_mut().set_gpu_vram_gb(gpu_vram_gb);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_default_initialization() {
+        let stats = SystemStatsBackendRust::default();
+        assert_eq!(stats.cpu_usage, 0.0);
+        assert_eq!(stats.ram_usage, 0.0);
+        assert_eq!(stats.disk_usage, 0.0);
+        assert_eq!(stats.gpu_usage, 0.0);
+        assert_eq!(stats.ram_gb, 0.0);
+        assert_eq!(stats.disk_gb, 0.0);
+        assert_eq!(stats.gpu_vram_gb, 0.0);
+    }
+}
