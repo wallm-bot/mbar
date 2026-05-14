@@ -75,7 +75,7 @@ impl qobject::DateTimeBackend {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::{TimeZone, Utc, FixedOffset};
+    use chrono::{TimeZone, FixedOffset};
 
     #[test]
     fn test_get_datetime_info_format() {
