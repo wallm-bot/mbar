@@ -12,10 +12,14 @@ mod qobject {
         #[qproperty(QString, day)]
         #[qproperty(QString, date)]
         #[qproperty(QString, timezone)]
+        #[qproperty(u32, timezone_index)]
         type DateTimeBackend = super::DateTimeBackendRust;
 
         #[qinvokable]
         fn update_time(self: Pin<&mut DateTimeBackend>);
+
+        #[qinvokable]
+        fn request_timezone_change(self: Pin<&mut DateTimeBackend>);
     }
 }
 
@@ -25,6 +29,7 @@ pub struct DateTimeBackendRust {
     day: cxx_qt_lib::QString,
     date: cxx_qt_lib::QString,
     timezone: cxx_qt_lib::QString,
+    timezone_index: u32,
 }
 
 pub struct DateTimeInfo {
@@ -63,12 +68,30 @@ where T::Offset: std::fmt::Display {
 
 impl qobject::DateTimeBackend {
     pub fn update_time(mut self: std::pin::Pin<&mut Self>) {
-        let info = get_datetime_info(chrono::Local::now());
+        let timezones = [
+            (5, 30, "India"),
+            (1, 0, "Netherlands"),
+            (2, 0, "Norway"),
+        ];
+
+        let idx = self.as_ref().timezone_index as usize;
+        let (h, m, _) = timezones[idx];
+        let offset = chrono::FixedOffset::east_opt((h * 3600 + m * 60) as i32).unwrap();
+        let now = chrono::Local::now().with_timezone(&offset);
+
+        let info = get_datetime_info(now);
 
         self.as_mut().set_time(cxx_qt_lib::QString::from(&info.time));
         self.as_mut().set_day(cxx_qt_lib::QString::from(&info.day));
         self.as_mut().set_date(cxx_qt_lib::QString::from(&info.date));
         self.as_mut().set_timezone(cxx_qt_lib::QString::from(&info.timezone));
+    }
+
+    pub fn request_timezone_change(mut self: std::pin::Pin<&mut Self>) {
+        let current_idx = self.as_ref().timezone_index;
+        let next_idx = (current_idx + 1) % 3;
+        self.as_mut().set_timezone_index(next_idx);
+        self.as_mut().update_time();
     }
 }
 
