@@ -20,6 +20,7 @@ jobs:
           build-essential \
           cmake \
           qt6-base-dev \
+          qt6-declarative-dev \
           libglib2.0-dev \
           libfontconfig1-dev \
           libdbus-1-dev
